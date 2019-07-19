@@ -71,7 +71,7 @@ export default {
     const images$ = createLoader('http://localhost:8000/images')
     const uploadImage$ = file$.pipe(
       switchMap(prepareFile),
-      uploadFile
+      switchMap(uploadFile)
     )
     return {
       file$,
