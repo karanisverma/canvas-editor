@@ -3,8 +3,11 @@ import App from './App.vue'
 
 import VueRx from 'vue-rx'
 
-Vue.use(VueRx)
+import axios from "axios"
+import VueAxios from "vue-axios"
 
+Vue.use(VueRx)
+Vue.use(VueAxios, axios)
 Vue.config.productionTip = false
 
 new Vue({

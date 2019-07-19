@@ -1,0 +1,41 @@
+.sidebar{
+  width: 33%;
+  input[type="file"] {
+    display: none;
+}
+  .custom-file-upload{
+    padding: 10px 25px;
+    font-size: 1em;
+    font-weight: lighter;
+    border-radius: 3px;
+    border: 1px solid gray;
+    width: 100%;
+    &:hover{
+      background: pink;
+    }
+    &:active{
+      background: #f9748b;
+      color:white;
+    }
+  }
+  .images{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .images-thumbnail{
+    box-sizing: border-box;
+    padding: 1em;
+    
+    border-radius: 10px;
+    flex: 1;
+    max-width: 45%;
+    margin: 5% 2.5%;
+    &:hover{
+      background: pink;
+    }
+    &:active{
+      background: #f9748b;
+    }
+  }
+}
