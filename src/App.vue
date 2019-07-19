@@ -6,7 +6,7 @@
         <label for="file-upload" class="custom-file-upload">
           <i class="fa fa-cloud-upload"></i> Upload
         </label>
-        <input id="file-upload" type="file" ref="file" @change="handleFileUpload" />
+        <input id="file-upload" type="file" ref="file" @change="handleFileUpload()" name="upload"/>
       </div>
       <div class="assets">
         <div class="images">
@@ -43,34 +43,41 @@ export default {
       file: null,
     }
   },
-  methods:{
-    handleFileUpload(){
+  methods: {
+    handleFileUpload() {
       this.file = this.$refs.file.files[0]
-    }
+      console.log('handleFileUpload-->', this.file)
+    },
   },
   subscriptions() {
-    const file$ = this.$watchAsObservable("file",{
-      immediate: false
+    const file$ = this.$watchAsObservable('file', {
+      immediate: false,
     }).pipe(pluck('newValue'))
-    const prepareFile = file => {
-      console.log('prepareFile-->', file)
-      const formData = new FormData()
-      formData.append('file', file)
-      return formData
+    // const prepareFile = file => {
+    //   console.log('prepareFile-->', file)
+    //   const formData = new FormData()
+    //   formData.append('file', file)
+    //   return formData
+    // }
+    const uploadFile = file => {
+      console.log('uploadfile file -->', file)
+      let formData = new FormData()
+      formData.append('upload', file)
+      console.log('uploadFile-->', formData)
+          for (var key of formData.entries()) {
+        console.log(key[0] + ', ' + key[1]);
     }
-    const uploadFile = formData =>
-      from(
-        this.$http.post('http://localhost:8000/uploads', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
-      ).pipe(pluck('data'))
+      return from(
+        fetch('http://localhost:8000/uploads', {
+          method: 'POST',
+          body: formData,
+        }).then(res=>res.json()).catch(err=>console.log(err))
+      )
+    }
 
-    const createLoader = url => from(this.$http.get(url)).pipe(pluck('data'))
+    const createLoader = url => from(fetch(url).then(res=>res.json()))
     const images$ = createLoader('http://localhost:8000/images')
     const uploadImage$ = file$.pipe(
-      switchMap(prepareFile),
       switchMap(uploadFile)
     )
     return {
