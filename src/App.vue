@@ -4,12 +4,18 @@
       <div class="form">
         <label for="file-upload" class="custom-file-upload">
           <i class="fa fa-cloud-upload"></i> Upload
+          {{selectedPics$}}
         </label>
         <input id="file-upload" type="file" ref="file" @change="handleFileUpload()" name="upload" />
       </div>
       <div class="assets">
         <div class="images">
-          <img v-for="(image, index) in images$" :key="index" :src="image" class="images-thumbnail" />
+          <img 
+          v-for="(image, index) in images$" 
+          :key="index" 
+          :src="image"
+          v-stream:click="{subject:clickOnThumbnails$, data:image}"
+          class="images-thumbnail" />
         </div>
       </div>
     </section>
@@ -18,7 +24,7 @@
       <!-- text and images will be a object their respactive position in it -->
       <img
         ref="dragimg"
-        src="http://localhost:8000/images/uploads-1462948470584.png"
+        :src="canvasImage$"
         class="images-thumbnail"
       />
     </section>
@@ -41,7 +47,7 @@ import {
 } from 'rxjs/operators'
 import './style.scss'
 export default {
-  domStreams: ['fileUploadChange$'],
+  domStreams: ['clickOnThumbnails$'],
   data() {
     return {
       file: null,
@@ -50,6 +56,7 @@ export default {
   data() {
     return {
       file: null,
+      selectedImages:[],
     }
   },
   methods: {
@@ -63,9 +70,15 @@ export default {
     const move$ = fromEvent(document, 'mousemove')
     const down$ = fromEvent(document, 'mousedown')
     const up$ = fromEvent(document, 'mouseup')
-
+    let img = []
+    const canvasImage$ = this.clickOnThumbnails$.pipe(
+      pluck('data'),
+      startWith('http://localhost:8000/images/uploads-1462948470584.png'))
+    const selectedPics$ = (imageURL) => imageURL => of([...this.selectedImages, imageURL])
     const track$ = down$.pipe(mergeMap(down => move$.pipe(takeUntil(up$))))
-    track$.subscribe(log)
+    const selectedImages$ = canvasImage$.subscribe(selectedPics$)
+    // track$.subscribe(log)
+    // d$.subscribe(log)
 
     const file$ = this.$watchAsObservable('file', {
       immediate: false,
@@ -91,6 +104,9 @@ export default {
       file$,
       images$,
       uploadImage$,
+      canvasImage$,
+      selectedImages$,
+      selectedPics$,
     }
   },
 }
